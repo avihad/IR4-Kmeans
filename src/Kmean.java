@@ -9,10 +9,10 @@ import java.util.concurrent.Executors;
 
 public class Kmean {
 
-    private double[][]	  distMap;
-    private List<SparseVector>  vectors;
-    private List<Integer>       centroids  = new ArrayList<Integer>();
-    private List<List<Integer>> membership = new ArrayList<List<Integer>>();
+    protected double[][]	  distMap;
+    protected List<SparseVector>  vectors;
+    protected List<Integer>       centroids  = new ArrayList<Integer>();
+    protected List<List<Integer>> membership = new ArrayList<List<Integer>>();
 
     public Kmean(List<SparseVector> vectors) throws InterruptedException {
 	super();
@@ -22,6 +22,20 @@ public class Kmean {
 
     public void calcKmean(int k) {
 
+	initCentroids(k);
+
+	int move = this.vectors.size();
+	while (move > (0.1 * this.vectors.size())) {
+
+	    move = recalcMembersip();
+	    recalcCentroids();
+
+	    System.out.println(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance()
+		    .getTime()));
+	}
+    }
+
+    protected void initCentroids(int k) {
 	Double tmp;
 	for (int i = 0; i < k; i++) {
 	    tmp = Math.random() * this.vectors.size();
@@ -32,16 +46,6 @@ public class Kmean {
 	}
 	for (int i = 0; i < k; i++) {
 	    this.membership.add(new ArrayList<Integer>());
-	}
-
-	int move = this.vectors.size();
-	while (move > (0.1 * this.vectors.size())) {
-
-	    move = recalcMembersip();
-	    recalcCentroids();
-
-	    System.out.println(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance()
-		    .getTime()));
 	}
     }
 
@@ -56,7 +60,7 @@ public class Kmean {
     }
 
     public void calcDistMat(List<SparseVector> vectors) throws InterruptedException {
-	final ExecutorService executor = Executors.newFixedThreadPool(8);
+	final ExecutorService executor = Executors.newFixedThreadPool(4);
 
 	final int size = vectors.size();
 	final double[][] mat = new double[size][size];
@@ -68,7 +72,7 @@ public class Kmean {
 	}
 	executor.shutdown();
 	while (!executor.isTerminated()) {
-	    Thread.sleep(10000);
+	    Thread.sleep(2000);
 	}
 
 	System.out.println("Finished all threads");
@@ -142,18 +146,31 @@ public class Kmean {
     }
 
     public int findClosestCentroid(int j) {
-	double dist = Double.MAX_VALUE;
+	double lowestDistance = Double.MAX_VALUE;
 	int ans = 0;
-	double tmp_dist;
+	double distance;
 	for (int i = 0; i < this.centroids.size(); i++) {
-	    tmp_dist = this.distMap[j][this.centroids.get(i)];
-	    if (tmp_dist < dist) {
-		dist = tmp_dist;
+	    distance = this.distMap[j][this.centroids.get(i)];
+	    if (distance < lowestDistance) {
+		lowestDistance = distance;
 		ans = i;
 	    }
 
 	}
 	return ans;
+    }
+
+    public double findClosestCentroidDistance(int j) {
+	double lowestDistance = Double.MAX_VALUE;
+	double distance;
+	for (int i = 0; i < this.centroids.size(); i++) {
+	    distance = this.distMap[j][this.centroids.get(i)];
+	    if (distance < lowestDistance) {
+		lowestDistance = distance;
+	    }
+
+	}
+	return lowestDistance;
     }
 
 }

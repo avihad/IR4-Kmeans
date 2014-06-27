@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class PrecisionCalculator {
 
     // init - read file and fill map
-    public static void goldStandartReader(File truth) {
+    public static void goldStandartReader(File truthFilePath) {
 
 	// File truth = truth_input;
 
@@ -18,7 +18,7 @@ public class PrecisionCalculator {
 
 	// reading the truth file
 	try {
-	    in = new BufferedReader(new FileReader(truth));
+	    in = new BufferedReader(new FileReader(truthFilePath));
 	}
 	catch (final FileNotFoundException e) {
 	    // TODO Auto-generated catch block
