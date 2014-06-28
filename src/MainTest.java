@@ -46,8 +46,8 @@ public class MainTest {
 	tmp.add(30.0);
 
 	vectors.add(tmp);
-	final Kmean localKMean = new Kmean(vectors);
-	localKMean.calcKmean(3);
+	// final Kmean localKMean = new Kmean(vectors);
+	// localKMean.calcKmean(3);
 
     }
 

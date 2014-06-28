@@ -1,7 +1,9 @@
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -12,15 +14,16 @@ import org.apache.tika.sax.BodyContentHandler;
 
 public class Doc {
 
-    private List<Term> termList = new ArrayList<Term>();
-    private String     document;
-    private int	docId;
-    private int	docCluster;
-    private int	docGoldStadartCluster;
+    private List<Term>   termList = new ArrayList<Term>();
+    private String       documentName;
+    private int	  docId;
+    private int	  docCluster;
+    private int	  docGoldStadartCluster;
+    private SparseVector sparseVector;
 
     public Doc(String document, int docId, int docGoldStadartCluster) {
 	super();
-	this.document = document;
+	this.documentName = document;
 	this.docId = docId;
 	this.docGoldStadartCluster = docGoldStadartCluster;
     }
@@ -76,12 +79,12 @@ public class Doc {
      * private String stemmer(String word){ PorterStemmer obj = new PorterStemmer(); obj.setCurrent(word);
      * obj.stem(); return obj.getCurrent().toLowerCase(); }
      */
-    public SparseVector createTfIdfVector() {
-	final SparseVector vec = new SparseVector();
-	for (final Term tmpTerm : Dictionary.TermList.values()) {
-	    vec.add(tmpTerm.tf_DF(this.docId));
+    public void createTfIdfVector() {
+	final SparseVector vector = new SparseVector();
+	for (final Term term : Dictionary.TermList.values()) {
+	    vector.add(term.tf_DF(this.docId));
 	}
-	return vec;
+	this.sparseVector = vector;
     }
 
     public static boolean isStopWord(String word) {
@@ -100,6 +103,19 @@ public class Doc {
 	}
     }
 
+    public double distance(Doc otherDoc) {
+	double sum = 0;
+	final SparseVector mySparseVector = this.getSparseVector();
+	final SparseVector otherSparseVector = otherDoc.getSparseVector();
+
+	final Set<Integer> set = new HashSet<Integer>(mySparseVector.getVector().keySet());
+	set.addAll(otherSparseVector.getVector().keySet());
+	for (final Integer i : set) {
+	    sum += Math.pow(mySparseVector.get(i) - otherSparseVector.get(i), 2);
+	}
+	return Math.sqrt(sum);
+    }
+
     public List<Term> getTermList() {
 	return this.termList;
     }
@@ -108,12 +124,8 @@ public class Doc {
 	this.termList = termList;
     }
 
-    public String getDocument() {
-	return this.document;
-    }
-
-    public void setDocument(String document) {
-	this.document = document;
+    public String getDocumentName() {
+	return this.documentName;
     }
 
     public int getDocId() {
@@ -138,6 +150,10 @@ public class Doc {
 
     public void setDocGoldStadartCluster(int docGoldStadartCluster) {
 	this.docGoldStadartCluster = docGoldStadartCluster;
+    }
+
+    public SparseVector getSparseVector() {
+	return this.sparseVector;
     }
 
 }

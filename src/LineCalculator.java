@@ -2,24 +2,28 @@ import java.util.List;
 
 public class LineCalculator implements Runnable {
 
-    private int	      line;
-    private double[][]       mat;
-    private List<SparseVector> vectors;
+    private int	line;
+    private int	range;
+    private double[][] mat;
+    private List<Doc>  docs;
 
-    public LineCalculator(int line, double[][] mat, List<SparseVector> vectors) {
+    public LineCalculator(int line, int range, double[][] mat, List<Doc> docs) {
 	super();
 	this.line = line;
+	this.range = range;
 	this.mat = mat;
-	this.vectors = vectors;
+	this.docs = docs;
     }
 
     @Override
     public void run() {
-	final int i = this.line;
-	for (int j = 0; j <= i; j++) {
-	    this.mat[i][j] = Kmean.dist(this.vectors.get(i), this.vectors.get(j));
+	for (int r = this.line; r < this.line + this.range && r < this.mat.length; r++) {
+	    for (int j = 0; j <= r; j++) {
+		double tmp = this.docs.get(r).distance(this.docs.get(j));
+		this.mat[r][j] = tmp;
+	    }
 	}
-	System.out.println("finished line: " + i);
+	System.out.println("finished line range: " + this.line + " - " + (this.line + this.range));
     }
 
 }

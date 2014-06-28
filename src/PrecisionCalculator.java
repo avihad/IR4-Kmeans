@@ -44,8 +44,8 @@ public class PrecisionCalculator {
 		 */
 		tmpDoc = new Doc(docName, docId, cluster);
 		// tmpDoc = dictionary.nameTodoc.get(doc_name);
-		Dictionary.nameTodoc.put(docName, tmpDoc);
-		Dictionary.docToname.put(tmpDoc, docName);
+		Dictionary.nameTodoc2.put(docName, tmpDoc);
+		Dictionary.docToname2.put(tmpDoc, docName);
 
 	    }
 	}

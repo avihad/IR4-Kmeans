@@ -1,9 +1,9 @@
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SparseVector {
-    private int			    index  = 0;
-    private ConcurrentMap<Integer, Double> vector = new ConcurrentHashMap<Integer, Double>();
+    private int		  index  = 0;
+    private Map<Integer, Double> vector = new HashMap<Integer, Double>();
 
     boolean add(Double e) {
 	if (e != 0) {
@@ -38,7 +38,7 @@ public class SparseVector {
 	return this.index;
     }
 
-    public ConcurrentMap<Integer, Double> getVector() {
+    public Map<Integer, Double> getVector() {
 	return this.vector;
     }
 
