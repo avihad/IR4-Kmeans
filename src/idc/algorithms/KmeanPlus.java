@@ -1,3 +1,7 @@
+package idc.algorithms;
+
+import idc.datastructs.Doc;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,8 +15,8 @@ import java.util.Random;
 
 public class KmeanPlus extends Kmean {
 
-    public KmeanPlus(List<Doc> docs) throws InterruptedException {
-	super(docs);
+    public KmeanPlus(List<Doc> docs, boolean advanceMod) throws InterruptedException {
+	super(docs, advanceMod);
     }
 
     @Override
@@ -75,17 +79,6 @@ public class KmeanPlus extends Kmean {
 	    }
 
 	    this.centroids.add(clusterIndex);
-
-	    /*
-	     * int clusterIndex = rand.nextDouble(); clusterIndex = clusterIndex == probDistMap.size() ?
-	     * probDistMap.size() - 1 : clusterIndex; clusterIndex = clusterIndex > 0 ? clusterIndex :
-	     * Math.abs(clusterIndex) - 1;
-	     * 
-	     * clusterIndex = new LinkedList<Entry<Integer, Double>>(probDistMap.entrySet()).get(clusterIndex)
-	     * .getKey();
-	     * 
-	     * this.centroids.add(clusterIndex);
-	     */
 	}
 
     }

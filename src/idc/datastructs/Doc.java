@@ -1,11 +1,16 @@
+package idc.datastructs;
+import idc.algorithms.PorterStemmer;
+
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.html.HtmlParser;
 import org.apache.tika.sax.BodyContentHandler;
@@ -14,12 +19,19 @@ import org.apache.tika.sax.BodyContentHandler;
 
 public class Doc {
 
-    private List<Term>   termList = new ArrayList<Term>();
-    private String       documentName;
-    private int	  docId;
-    private int	  docCluster;
-    private int	  docGoldStadartCluster;
-    private SparseVector sparseVector;
+    private static final List<String> identifierWords = Arrays.asList("E-Mail:", "Phone:");
+    private static final List<String> stopWords       = Arrays.asList("an", "and", "are", "as", "at", "be",
+							      "but", "by", "for", "if", "in", "into", "is",
+							      "it", "no", "not", "of", "on", "or", "such",
+							      "that", "the", "their", "then", "there",
+							      "these", "they", "this", "to", "was", "will",
+							      "with");
+    private List<Term>		termList	= new ArrayList<Term>();
+    private String		    documentName;
+    private int		       docId;
+    private int		       docCluster;
+    private int		       docGoldStadartCluster;
+    private SparseVector	      sparseVector;
 
     public Doc(String document, int docId, int docGoldStadartCluster) {
 	super();
@@ -36,11 +48,17 @@ public class Doc {
 
 	    final BodyContentHandler handler = new BodyContentHandler(10000000);
 	    final Metadata metadata = new Metadata();
+	    metadata.add(TikaCoreProperties.TITLE, "title");
 
 	    new HtmlParser().parse(inputFile, handler, metadata, new ParseContext());
 	    final String plainText = handler.toString();
 
-	    this.parseText(plainText);
+	    final String docTitle = metadata.get("title");
+	    if (docTitle.isEmpty()) {
+		this.parseText(plainText);
+	    } else {
+		this.parseText(plainText);
+	    }
 	}
 	catch (final Exception e) {
 	    e.printStackTrace();
@@ -55,10 +73,16 @@ public class Doc {
 	    words[i] = words[i].replaceAll("[^A-Za-z ]", "").toLowerCase();
 	}
 	Term tmpTerm;
-	for (final String word : words) {
+	for (String word : words) {
 	    if ((word.length() <= 3) || (word.length() >= 11)) {
 		continue;
 	    }
+	    // Stemming the word
+	    final PorterStemmer stemmer = new PorterStemmer();
+	    stemmer.add(word.toCharArray(), word.length());
+	    stemmer.stem();
+	    word = stemmer.toString();
+
 	    if (isStopWord(word)) {
 		continue;
 	    }
@@ -88,19 +112,11 @@ public class Doc {
     }
 
     public static boolean isStopWord(String word) {
-	if (word.equals("a") || word.equals("an") || word.equals("and") || word.equals("are")
-		|| word.equals("as") || word.equals("at") || word.equals("be") || word.equals("but")
-		|| word.equals("by") || word.equals("for") || word.equals("if") || word.equals("in")
-		|| word.equals("into") || word.equals("is") || word.equals("it") || word.equals("no")
-		|| word.equals("not") || word.equals("of") || word.equals("on") || word.equals("or")
-		|| word.equals("such") || word.equals("that") || word.equals("the") || word.equals("their")
-		|| word.equals("then") || word.equals("there") || word.equals("these") || word.equals("they")
-		|| word.equals("this") || word.equals("to") || word.equals("was") || word.equals("will")
-		|| word.equals("withword.equals(")) {
-	    return true;
-	} else {
-	    return false;
-	}
+	return stopWords.contains(word);
+    }
+
+    public static boolean isIdentifierWord(String word) {
+	return identifierWords.contains(word);
     }
 
     public double distance(Doc otherDoc) {

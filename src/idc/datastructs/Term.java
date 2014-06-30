@@ -1,3 +1,4 @@
+package idc.datastructs;
 import java.util.HashMap;
 
 public class Term {
